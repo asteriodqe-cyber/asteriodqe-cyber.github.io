@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YISUN SPACE — App</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Josefin+Sans:wght@100;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF7F0;
+    --sky: #A8D8EA;
+    --cerulean: #87CEEB;
+    --warm-gold: #E8D5A3;
+    --ink: #3A3A3A;
+    --light-ink: #6B6B6B;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: 'Josefin Sans', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  #marbleCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .cursor-glow {
+    position: fixed;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(168,216,234,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 5;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Top bar */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 36px;
+    background: rgba(250,247,240,0.7);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(168,216,234,0.15);
+    opacity: 0;
+    animation: fadeIn 0.6s ease 0.4s forwards;
+  }
+
+  .topbar-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 18px;
+    letter-spacing: 8px;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .user-handle {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--light-ink);
+    text-transform: uppercase;
+  }
+
+  .logout-btn {
+    background: none;
+    border: 1px solid rgba(168,216,234,0.4);
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--light-ink);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .logout-btn:hover { border-color: var(--sky); color: var(--ink); }
+
+  /* Main */
+  .container {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 20px 60px;
+  }
+
+  .greeting {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(36px, 7vw, 72px);
+    color: var(--ink);
+    letter-spacing: 6px;
+    text-align: center;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+    margin-bottom: 12px;
+  }
+
+  .greeting-sub {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--light-ink);
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+    margin-bottom: 60px;
+  }
+
+  .divider {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--sky), var(--warm-gold), transparent);
+    margin: 0 auto 60px;
+    opacity: 0;
+    animation: fadeIn 1s ease 1s forwards;
+  }
+
+  /* Space grid — placeholder for future sub-domains */
+  .space-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 700px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.1s forwards;
+  }
+
+  .space-card {
+    border: 1px solid rgba(168,216,234,0.25);
+    background: rgba(250,247,240,0.6);
+    backdrop-filter: blur(8px);
+    padding: 32px 28px;
+    transition: all 0.3s ease;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .space-card.coming-soon {
+    opacity: 0.5;
+  }
+
+  .space-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(168,216,234,0.08), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .space-card:hover::before { left: 100%; }
+
+  .space-card:hover {
+    border-color: rgba(168,216,234,0.5);
+  }
+
+  .card-tag {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: var(--cerulean);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--light-ink);
+    line-height: 1.8;
+  }
+
+  /* Profile section */
+  .profile-section {
+    width: 100%;
+    max-width: 700px;
+    margin-top: 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1.3s forwards;
+  }
+
+  .profile-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--light-ink);
+    margin-bottom: 12px;
+  }
+
+  .profile-card {
+    border: 1px solid rgba(168,216,234,0.2);
+    background: rgba(250,247,240,0.6);
+    backdrop-filter: blur(8px);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .profile-handle {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--ink);
+    letter-spacing: 3px;
+  }
+
+  .profile-public {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--light-ink);
+  }
+
+  .set-handle-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .set-handle-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(168,216,234,0.4);
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--ink);
+    padding: 4px 0;
+    width: 140px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .set-handle-input:focus { border-bottom-color: var(--sky); }
+  .set-handle-input::placeholder { color: rgba(107,107,107,0.3); font-weight: 100; }
+
+  .set-handle-btn {
+    background: none;
+    border: 1px solid rgba(168,216,234,0.4);
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--light-ink);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .set-handle-btn:hover { border-color: var(--sky); color: var(--ink); }
+
+  .set-handle-msg {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--light-ink);
+    margin-top: 8px;
+    min-height: 14px;
+  }
+
+  .set-handle-msg.error   { color: #C0776A; }
+  .set-handle-msg.success { color: #7AAF8A; }
+
+  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<canvas id="marbleCanvas"></canvas>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <span class="topbar-logo">Yisun Space</span>
+  <div class="topbar-right">
+    <span class="user-handle" id="topHandle">—</span>
+    <button class="logout-btn" onclick="doLogout()">登出 Logout</button>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="container">
+  <h1 class="greeting" id="greeting">Welcome</h1>
+  <p class="greeting-sub">你已进入 YISUN SPACE · you have entered</p>
+
+  <div class="divider"></div>
+
+  <!-- Space cards — future sub-domains go here -->
+  <div class="space-grid">
+    <div class="space-card coming-soon">
+      <p class="card-tag">Coming Soon</p>
+      <p class="card-title">Space 01</p>
+      <p class="card-desc">即将开放<br>More spaces arriving</p>
+    </div>
+    <div class="space-card coming-soon">
+      <p class="card-tag">Coming Soon</p>
+      <p class="card-title">Space 02</p>
+      <p class="card-desc">即将开放<br>More spaces arriving</p>
+    </div>
+  </div>
+
+  <!-- Profile -->
+  <div class="profile-section">
+    <p class="profile-label">Identity · 身份</p>
+    <div class="profile-card">
+      <div class="profile-info">
+        <p class="profile-handle" id="profileHandle">—</p>
+        <p class="profile-public" id="profilePublic">public handle 未设置</p>
+      </div>
+      <div>
+        <div class="set-handle-form">
+          <input class="set-handle-input" type="text" id="publicHandleInput" placeholder="设置展示名" maxlength="20" autocomplete="off">
+          <button class="set-handle-btn" onclick="setPublicHandle()">设置 Set</button>
+        </div>
+        <p class="set-handle-msg" id="setHandleMsg"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://apii.yisun.space';
+
+// ── Auth guard ─────────────────────────────────────────────────
+async function init() {
+  const token = sessionStorage.getItem('ys_token');
+  if (!token) {
+    window.location.href = '/gateway/';
+    return;
+  }
+
+  try {
+    const res  = await fetch(API + '/me', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    if (!res.ok) {
+      sessionStorage.removeItem('ys_token');
+      window.location.href = '/gateway/';
+      return;
+    }
+
+    const data = await res.json();
+    const user = data.user;
+
+    // Populate UI
+    const displayName = user.public_handle || user.handle;
+    document.getElementById('greeting').textContent    = 'Welcome';
+    document.getElementById('topHandle').textContent   = user.public_handle || user.handle;
+    document.getElementById('profileHandle').textContent = user.handle;
+    document.getElementById('profilePublic').textContent = user.public_handle
+      ? '@ ' + user.public_handle
+      : 'public handle 未设置 · not set';
+
+    if (user.public_handle) {
+      document.getElementById('publicHandleInput').value = user.public_handle;
+    }
+
+  } catch (_) {
+    window.location.href = '/gateway/';
+  }
+}
+
+// ── Set public handle ──────────────────────────────────────────
+async function setPublicHandle() {
+  const token = sessionStorage.getItem('ys_token');
+  const value = document.getElementById('publicHandleInput').value.trim();
+  const msg   = document.getElementById('setHandleMsg');
+
+  if (!value) { setMsg(msg, '请输入展示名 · enter a name', 'error'); return; }
+
+  msg.textContent = ''; msg.className = 'set-handle-msg';
+
+  try {
+    const res  = await fetch(API + '/handle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ public_handle: value })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      setMsg(msg, '已更新 · updated', 'success');
+      document.getElementById('topHandle').textContent   = data.public_handle;
+      document.getElementById('profilePublic').textContent = '@ ' + data.public_handle;
+    } else if (data.error === 'handle_unavailable') {
+      setMsg(msg, '该名称已被占用 · name taken', 'error');
+    } else if (data.error === 'invalid_handle') {
+      setMsg(msg, '格式不符（3-20位字母数字下划线）· invalid format', 'error');
+    } else {
+      setMsg(msg, '更新失败 · update failed', 'error');
+    }
+  } catch (_) {
+    setMsg(msg, '网络错误 · network error', 'error');
+  }
+}
+
+function setMsg(el, text, type) {
+  el.textContent = text;
+  el.className   = 'set-handle-msg ' + type;
+}
+
+// ── Logout ─────────────────────────────────────────────────────
+async function doLogout() {
+  const token = sessionStorage.getItem('ys_token');
+  if (!token) { window.location.href = '/gateway/'; return; }
+
+  try {
+    await fetch(API + '/logout', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+  } catch (_) {}
+
+  sessionStorage.removeItem('ys_token');
+  window.location.href = '/gateway/';
+}
+
+// Enter key for handle input
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('publicHandleInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') setPublicHandle();
+  });
+});
+
+init();
+
+// ── Marble canvas ──────────────────────────────────────────────
+const canvas = document.getElementById('marbleCanvas');
+const ctx    = canvas.getContext('2d');
+
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+const COLORS = [
+  ['#A8D8EA','#D6EAF8','#87CEEB'],
+  ['#F5EDD8','#EDE0C4','#E8D5A3'],
+  ['#B8E0F7','#A8D8EA','#ffffff'],
+];
+
+class Marble {
+  constructor() { this.reset(true); }
+  reset(init = false) {
+    this.r  = Math.random() * 16 + 6;
+    this.x  = Math.random() * canvas.width;
+    this.y  = init ? Math.random() * canvas.height : canvas.height + this.r;
+    this.vx = (Math.random() - 0.5) * 0.7;
+    this.vy = -(Math.random() * 1.1 + 0.3);
+    this.colors  = COLORS[Math.floor(Math.random() * COLORS.length)];
+    this.opacity = Math.random() * 0.35 + 0.1;
+    this.shimmer = Math.random() * Math.PI * 2;
+  }
+  draw() {
+    this.shimmer += 0.015;
+    const g = ctx.createRadialGradient(
+      this.x - this.r * 0.3, this.y - this.r * 0.3, this.r * 0.1,
+      this.x, this.y, this.r
+    );
+    g.addColorStop(0, this.colors[2] + 'FF');
+    g.addColorStop(0.5, this.colors[0] + 'CC');
+    g.addColorStop(1, this.colors[1] + '44');
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    ctx.shadowColor = this.colors[0];
+    ctx.shadowBlur  = this.r * 1.2;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.restore();
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x - this.r < 0 || this.x + this.r > canvas.width) this.vx *= -1;
+    if (this.y + this.r < -20) this.reset();
+  }
+}
+
+const marbles = Array.from({ length: 30 }, () => new Marble());
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  marbles.forEach(m => m.draw());
+  requestAnimationFrame(animate);
+}
+animate();
+
+const glow = document.getElementById('cursorGlow');
+document.addEventListener('mousemove', e => {
+  glow.style.left = e.clientX + 'px';
+  glow.style.top  = e.clientY + 'px';
+});
+</script>
+</body>
+</html>

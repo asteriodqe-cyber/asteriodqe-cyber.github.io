@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YISUN SPACE — Enter</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Josefin+Sans:wght@100;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF7F0;
+    --sky: #A8D8EA;
+    --cerulean: #87CEEB;
+    --azure: #B8E0F7;
+    --warm-gold: #E8D5A3;
+    --soft-sand: #EDE0C4;
+    --ink: #3A3A3A;
+    --light-ink: #6B6B6B;
+    --error: #C0776A;
+    --success: #7AAF8A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: 'Josefin Sans', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  #marbleCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .cursor-glow {
+    position: fixed;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(168,216,234,0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 5;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Back link */
+  .back-link {
+    position: fixed;
+    top: 32px; left: 36px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--light-ink);
+    text-decoration: none;
+    text-transform: uppercase;
+    z-index: 20;
+    opacity: 0;
+    animation: fadeIn 0.8s ease 0.3s forwards;
+    transition: color 0.3s ease;
+  }
+  .back-link:hover { color: var(--ink); }
+  .back-link::before { content: '← '; }
+
+  /* Main layout */
+  .container {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px 60px;
+  }
+
+  /* Wordmark */
+  .wordmark {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(28px, 5vw, 48px);
+    color: var(--ink);
+    letter-spacing: 12px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fadeIn 0.8s ease 0.4s forwards;
+  }
+
+  .wordmark-sub {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 10px;
+    letter-spacing: 6px;
+    color: var(--light-ink);
+    text-transform: uppercase;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeIn 0.8s ease 0.6s forwards;
+  }
+
+  /* Card */
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(250,247,240,0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(168,216,234,0.3);
+    padding: 44px 40px 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.7s forwards;
+  }
+
+  /* Tab switcher */
+  .tabs {
+    display: flex;
+    margin-bottom: 36px;
+    border-bottom: 1px solid rgba(168,216,234,0.4);
+  }
+
+  .tab {
+    flex: 1;
+    background: none;
+    border: none;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--light-ink);
+    padding: 0 0 14px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  .tab::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0;
+    width: 0; height: 1px;
+    background: linear-gradient(90deg, var(--sky), var(--warm-gold));
+    transition: width 0.4s ease;
+  }
+
+  .tab.active { color: var(--ink); }
+  .tab.active::after { width: 100%; }
+
+  /* Form panels */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Form fields */
+  .field {
+    margin-bottom: 24px;
+  }
+
+  .field label {
+    display: block;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--light-ink);
+    margin-bottom: 8px;
+  }
+
+  .field input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(168,216,234,0.5);
+    padding: 8px 0;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .field input:focus {
+    border-bottom-color: var(--sky);
+  }
+
+  .field input::placeholder {
+    color: rgba(107,107,107,0.3);
+    font-weight: 100;
+    letter-spacing: 2px;
+  }
+
+  /* Submit button */
+  .btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(168,216,234,0.6);
+    padding: 14px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(168,216,234,0.15), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn:hover::before { left: 100%; }
+  .btn:hover {
+    border-color: var(--sky);
+    color: var(--cerulean);
+  }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn.loading::after {
+    content: '';
+    display: inline-block;
+    width: 10px; height: 10px;
+    border: 1px solid var(--sky);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  /* Message */
+  .message {
+    margin-top: 20px;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-align: center;
+    min-height: 16px;
+    transition: all 0.3s ease;
+  }
+  .message.error   { color: var(--error); }
+  .message.success { color: var(--success); }
+
+  /* Password note */
+  .field-note {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(107,107,107,0.5);
+    margin-top: 6px;
+  }
+
+  /* Divider line in card */
+  .card-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(168,216,234,0.3), transparent);
+    margin: 28px 0;
+  }
+
+  @keyframes fadeIn  { to { opacity: 1; } }
+  @keyframes fadeUp  {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin    { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<canvas id="marbleCanvas"></canvas>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<a href="/" class="back-link">返回 Return</a>
+
+<div class="container">
+  <p class="wordmark">Yisun Space</p>
+  <p class="wordmark-sub">— Identity Gateway —</p>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" id="tabLogin"    onclick="switchTab('login')">登录 Login</button>
+      <button class="tab"        id="tabRegister" onclick="switchTab('register')">注册 Register</button>
+    </div>
+
+    <!-- Login panel -->
+    <div class="panel active" id="panelLogin">
+      <div class="field">
+        <label>Handle 身份标识</label>
+        <input type="text" id="loginHandle" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label>Password 密码</label>
+        <input type="password" id="loginPassword" placeholder="••••••••">
+      </div>
+      <button class="btn" id="btnLogin" onclick="doLogin()">进入 Enter</button>
+      <p class="message" id="msgLogin"></p>
+
+      <div class="card-divider"></div>
+      <p style="font-family:'Josefin Sans',sans-serif;font-weight:100;font-size:9px;letter-spacing:3px;color:var(--light-ink);text-align:center;">
+        忘记 Handle？使用 Recovery Key 找回<br>
+        <span style="opacity:0.5">Forgot handle? use recovery key to look up</span>
+      </p>
+      <div class="field" style="margin-top:16px;margin-bottom:0;">
+        <label>Recovery Key 恢复密钥（选填）</label>
+        <input type="text" id="lookupKey" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+      </div>
+      <button class="btn" style="margin-top:16px;" onclick="doLookup()">查询 Handle Look up</button>
+      <p class="message" id="msgLookup"></p>
+    </div>
+
+    <!-- Register panel -->
+    <div class="panel" id="panelRegister">
+      <div class="field">
+        <label>Password 密码</label>
+        <input type="password" id="regPassword" placeholder="••••••••">
+        <p class="field-note">至少 8 个字符 · minimum 8 characters</p>
+      </div>
+      <div class="field">
+        <label>Confirm Password 确认密码</label>
+        <input type="password" id="regPasswordConfirm" placeholder="••••••••">
+      </div>
+      <button class="btn" id="btnRegister" onclick="doRegister()">创建身份 Create Identity</button>
+      <p class="message" id="msgRegister"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://apii.yisun.space';
+
+// ── Tab switcher ───────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  clearMessages();
+}
+
+function clearMessages() {
+  ['msgLogin','msgRegister','msgLookup'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = ''; el.className = 'message'; }
+  });
+}
+
+function setMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'message ' + type;
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  if (loading) btn.classList.add('loading');
+  else btn.classList.remove('loading');
+}
+
+// ── Auth check on load ─────────────────────────────────────────
+// If already logged in, redirect straight to /app/
+window.addEventListener('DOMContentLoaded', async () => {
+  const token = sessionStorage.getItem('ys_token');
+  if (!token) return;
+  try {
+    const res = await fetch(API + '/me', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) window.location.href = '/app/';
+  } catch (_) {}
+});
+
+// ── Login ──────────────────────────────────────────────────────
+async function doLogin() {
+  const handle   = document.getElementById('loginHandle').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!handle || !password) {
+    setMsg('msgLogin', '请填写所有字段 · Please fill all fields', 'error');
+    return;
+  }
+
+  setLoading('btnLogin', true);
+  setMsg('msgLogin', '', '');
+
+  try {
+    const res  = await fetch(API + '/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ handle, password })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      sessionStorage.setItem('ys_token', data.token);
+      setMsg('msgLogin', '验证成功，进入中… · Verified, entering…', 'success');
+      setTimeout(() => window.location.href = '/app/', 800);
+    } else {
+      setMsg('msgLogin', '身份验证失败，请检查凭证 · Invalid credentials', 'error');
+    }
+  } catch (_) {
+    setMsg('msgLogin', '网络错误，请稍后重试 · Network error', 'error');
+  } finally {
+    setLoading('btnLogin', false);
+  }
+}
+
+// ── Recovery key lookup ────────────────────────────────────────
+async function doLookup() {
+  const key = document.getElementById('lookupKey').value.trim().toUpperCase();
+
+  if (!key) {
+    setMsg('msgLookup', '请输入 Recovery Key · Enter recovery key', 'error');
+    return;
+  }
+
+  const btn = document.querySelector('#panelLogin .btn:nth-of-type(2)');
+  if (btn) { btn.disabled = true; btn.classList.add('loading'); }
+  setMsg('msgLookup', '', '');
+
+  try {
+    const res  = await fetch(API + '/recovery/lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recovery_key: key })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      document.getElementById('loginHandle').value = data.handle;
+      setMsg('msgLookup', 'Handle 已填入，请继续输入密码 · Handle found, enter your password', 'success');
+    } else {
+      setMsg('msgLookup', '未找到对应账号 · No account found for this key', 'error');
+    }
+  } catch (_) {
+    setMsg('msgLookup', '网络错误，请稍后重试 · Network error', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.classList.remove('loading'); }
+  }
+}
+
+// ── Register ───────────────────────────────────────────────────
+async function doRegister() {
+  const password        = document.getElementById('regPassword').value;
+  const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+  if (!password || !passwordConfirm) {
+    setMsg('msgRegister', '请填写所有字段 · Please fill all fields', 'error');
+    return;
+  }
+
+  if (password.length < 8) {
+    setMsg('msgRegister', '密码至少需要 8 个字符 · Password must be at least 8 characters', 'error');
+    return;
+  }
+
+  if (password !== passwordConfirm) {
+    setMsg('msgRegister', '两次密码不一致 · Passwords do not match', 'error');
+    return;
+  }
+
+  setLoading('btnRegister', true);
+  setMsg('msgRegister', '', '');
+
+  try {
+    const res  = await fetch(API + '/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      // Store credentials temporarily for the success page
+      sessionStorage.setItem('ys_token', data.token);
+      sessionStorage.setItem('ys_new_handle', data.handle);
+      sessionStorage.setItem('ys_new_rk', data.recovery_key);
+      setMsg('msgRegister', '身份创建成功，跳转中… · Identity created, redirecting…', 'success');
+      setTimeout(() => window.location.href = '/register-success/', 800);
+    } else if (data.error === 'weak_password') {
+      setMsg('msgRegister', '密码强度不足 · Password too weak', 'error');
+    } else {
+      setMsg('msgRegister', '注册失败，请稍后重试 · Registration failed', 'error');
+    }
+  } catch (_) {
+    setMsg('msgRegister', '网络错误，请稍后重试 · Network error', 'error');
+  } finally {
+    setLoading('btnRegister', false);
+  }
+}
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const loginActive = document.getElementById('panelLogin').classList.contains('active');
+  if (loginActive) doLogin();
+  else doRegister();
+});
+
+// ── Marble canvas ──────────────────────────────────────────────
+const canvas = document.getElementById('marbleCanvas');
+const ctx    = canvas.getContext('2d');
+
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+const COLORS = [
+  ['#A8D8EA','#D6EAF8','#87CEEB'],
+  ['#F5EDD8','#EDE0C4','#E8D5A3'],
+  ['#B8E0F7','#A8D8EA','#ffffff'],
+];
+
+class Marble {
+  constructor() { this.reset(true); }
+  reset(init = false) {
+    this.r  = Math.random() * 14 + 5;
+    this.x  = Math.random() * canvas.width;
+    this.y  = init ? Math.random() * canvas.height : canvas.height + this.r;
+    this.vx = (Math.random() - 0.5) * 0.6;
+    this.vy = -(Math.random() * 1 + 0.3);
+    this.colors = COLORS[Math.floor(Math.random() * COLORS.length)];
+    this.opacity = Math.random() * 0.3 + 0.08;
+    this.shimmer = Math.random() * Math.PI * 2;
+    this.shimmerSpeed = Math.random() * 0.02 + 0.01;
+  }
+  draw() {
+    this.shimmer += this.shimmerSpeed;
+    const g = ctx.createRadialGradient(
+      this.x - this.r * 0.3, this.y - this.r * 0.3, this.r * 0.1,
+      this.x, this.y, this.r
+    );
+    g.addColorStop(0, this.colors[2] + 'FF');
+    g.addColorStop(0.5 + Math.sin(this.shimmer) * 0.1, this.colors[0] + 'CC');
+    g.addColorStop(1, this.colors[1] + '44');
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    ctx.shadowColor = this.colors[0];
+    ctx.shadowBlur  = this.r;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.restore();
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x - this.r < 0 || this.x + this.r > canvas.width) this.vx *= -1;
+    if (this.y + this.r < -20) this.reset();
+  }
+}
+
+const marbles = Array.from({ length: 24 }, () => new Marble());
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  marbles.forEach(m => m.draw());
+  requestAnimationFrame(animate);
+}
+animate();
+
+const glow = document.getElementById('cursorGlow');
+document.addEventListener('mousemove', e => {
+  glow.style.left = e.clientX + 'px';
+  glow.style.top  = e.clientY + 'px';
+});
+</script>
+</body>
+</html>

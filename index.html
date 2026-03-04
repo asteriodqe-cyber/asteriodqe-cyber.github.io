@@ -28,7 +28,6 @@
     min-height: 100vh;
   }
 
-  /* Canvas background */
   #marbleCanvas {
     position: fixed;
     top: 0; left: 0;
@@ -37,7 +36,6 @@
     pointer-events: none;
   }
 
-  /* Main content */
   .container {
     position: relative;
     z-index: 10;
@@ -49,7 +47,6 @@
     padding: 40px 20px;
   }
 
-  /* Subtitle */
   .subtitle {
     font-family: 'Josefin Sans', sans-serif;
     font-weight: 100;
@@ -62,13 +59,13 @@
     animation: fadeUp 1s ease 0.5s forwards;
   }
 
-  /* Hero title with animated letters */
   .hero-title {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
     margin-bottom: 40px;
+    cursor: pointer;
   }
 
   .word {
@@ -87,28 +84,23 @@
     animation: letterRise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     position: relative;
     line-height: 0.9;
-    cursor: default;
+    cursor: pointer;
     transition: color 0.3s ease;
   }
 
-  .letter:hover {
-    color: var(--sky);
-  }
+  .letter:hover { color: var(--sky); }
 
-  /* Stagger delays for YISUN */
   .word:first-child .letter:nth-child(1) { animation-delay: 0.1s; }
   .word:first-child .letter:nth-child(2) { animation-delay: 0.18s; }
   .word:first-child .letter:nth-child(3) { animation-delay: 0.26s; }
   .word:first-child .letter:nth-child(4) { animation-delay: 0.34s; }
   .word:first-child .letter:nth-child(5) { animation-delay: 0.42s; }
-  /* SPACE */
-  .word:last-child .letter:nth-child(1) { animation-delay: 0.56s; }
-  .word:last-child .letter:nth-child(2) { animation-delay: 0.64s; }
-  .word:last-child .letter:nth-child(3) { animation-delay: 0.72s; }
-  .word:last-child .letter:nth-child(4) { animation-delay: 0.80s; }
-  .word:last-child .letter:nth-child(5) { animation-delay: 0.88s; }
+  .word:last-child .letter:nth-child(1)  { animation-delay: 0.56s; }
+  .word:last-child .letter:nth-child(2)  { animation-delay: 0.64s; }
+  .word:last-child .letter:nth-child(3)  { animation-delay: 0.72s; }
+  .word:last-child .letter:nth-child(4)  { animation-delay: 0.80s; }
+  .word:last-child .letter:nth-child(5)  { animation-delay: 0.88s; }
 
-  /* Divider */
   .divider {
     width: 0;
     height: 1px;
@@ -117,7 +109,6 @@
     animation: expandLine 1.2s ease 1.2s forwards;
   }
 
-  /* Tagline */
   .tagline {
     font-family: 'Josefin Sans', sans-serif;
     font-weight: 300;
@@ -130,7 +121,23 @@
     line-height: 2;
   }
 
-  /* Floating orbs decorative */
+  /* Enter hint */
+  .enter-hint {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 100;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--light-ink);
+    opacity: 0;
+    animation: fadeUp 1s ease 2s forwards;
+    text-transform: uppercase;
+    z-index: 10;
+  }
+
   .orbs-container {
     position: fixed;
     top: 0; left: 0;
@@ -139,53 +146,6 @@
     z-index: 1;
   }
 
-  .orb {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.18;
-    animation: float linear infinite;
-  }
-
-
-
-  /* Hero title clickable */
-  .hero-title {
-    cursor: pointer;
-  }
-
-  /* Animations */
-  @keyframes letterRise {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes expandLine {
-    to { width: 300px; }
-  }
-
-  @keyframes float {
-    0% { transform: translateY(100vh) scale(0); opacity: 0; }
-    10% { opacity: 0.18; }
-    90% { opacity: 0.18; }
-    100% { transform: translateY(-100px) scale(1); opacity: 0; }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 1; }
-  }
-
-
-
-  /* Cursor glow */
   .cursor-glow {
     position: fixed;
     width: 200px;
@@ -197,20 +157,33 @@
     transform: translate(-50%, -50%);
     transition: transform 0.1s ease;
   }
+
+  @keyframes letterRise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes expandLine {
+    to { width: 300px; }
+  }
+  @keyframes float {
+    0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+    10%  { opacity: 0.18; }
+    90%  { opacity: 0.18; }
+    100% { transform: translateY(-100px) scale(1); opacity: 0; }
+  }
 </style>
 </head>
 <body>
 
 <canvas id="marbleCanvas"></canvas>
 <div class="cursor-glow" id="cursorGlow"></div>
-
-<!-- Floating orbs -->
 <div class="orbs-container" id="orbsContainer"></div>
 
-<!-- Main -->
 <div class="container">
   <p class="subtitle">— Creative Studio —</p>
-  
+
   <div class="hero-title" id="heroTitle">
     <div class="word">
       <span class="letter">Y</span>
@@ -236,10 +209,10 @@
   </p>
 </div>
 
-
+<p class="enter-hint">点击标题进入 · click to enter</p>
 
 <script>
-// ===== MARBLE CANVAS (marbles / spheres) =====
+// ===== MARBLE CANVAS =====
 const canvas = document.getElementById('marbleCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -251,22 +224,19 @@ resize();
 window.addEventListener('resize', resize);
 
 const COLORS = [
-  ['#A8D8EA', '#D6EAF8', '#87CEEB'],
-  ['#F5EDD8', '#EDE0C4', '#E8D5A3'],
-  ['#B8E0F7', '#A8D8EA', '#ffffff'],
-  ['#FAF7F0', '#E8D5A3', '#F5EDD8'],
-  ['#87CEEB', '#B8E0F7', '#ffffff'],
+  ['#A8D8EA','#D6EAF8','#87CEEB'],
+  ['#F5EDD8','#EDE0C4','#E8D5A3'],
+  ['#B8E0F7','#A8D8EA','#ffffff'],
+  ['#FAF7F0','#E8D5A3','#F5EDD8'],
+  ['#87CEEB','#B8E0F7','#ffffff'],
 ];
 
 class Marble {
-  constructor() {
-    this.reset(true);
-  }
-
+  constructor() { this.reset(true); }
   reset(init = false) {
-    this.r = Math.random() * 18 + 8;
-    this.x = Math.random() * canvas.width;
-    this.y = init ? Math.random() * canvas.height : canvas.height + this.r + 10;
+    this.r  = Math.random() * 18 + 8;
+    this.x  = Math.random() * canvas.width;
+    this.y  = init ? Math.random() * canvas.height : canvas.height + this.r + 10;
     this.vx = (Math.random() - 0.5) * 0.8;
     this.vy = -(Math.random() * 1.2 + 0.4);
     this.colors = COLORS[Math.floor(Math.random() * COLORS.length)];
@@ -274,12 +244,9 @@ class Marble {
     this.shimmer = Math.random() * Math.PI * 2;
     this.shimmerSpeed = Math.random() * 0.02 + 0.01;
   }
-
   draw() {
     this.shimmer += this.shimmerSpeed;
     const shimOffset = Math.sin(this.shimmer) * 0.1;
-
-    // Main sphere gradient
     const g = ctx.createRadialGradient(
       this.x - this.r * 0.3, this.y - this.r * 0.3, this.r * 0.1,
       this.x, this.y, this.r
@@ -287,20 +254,14 @@ class Marble {
     g.addColorStop(0, this.colors[2] + 'FF');
     g.addColorStop(0.5 + shimOffset, this.colors[0] + 'CC');
     g.addColorStop(1, this.colors[1] + '44');
-
     ctx.save();
     ctx.globalAlpha = this.opacity;
-
-    // Shadow
     ctx.shadowColor = this.colors[0];
-    ctx.shadowBlur = this.r * 1.5;
-
+    ctx.shadowBlur  = this.r * 1.5;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fillStyle = g;
     ctx.fill();
-
-    // Specular highlight
     ctx.shadowBlur = 0;
     const sg = ctx.createRadialGradient(
       this.x - this.r * 0.35, this.y - this.r * 0.35, 0,
@@ -312,34 +273,23 @@ class Marble {
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fillStyle = sg;
     ctx.fill();
-
     ctx.restore();
-
-    // Move
     this.x += this.vx;
     this.y += this.vy;
-
-    // Bounce off sides
     if (this.x - this.r < 0 || this.x + this.r > canvas.width) this.vx *= -1;
-
-    // Reset when off top
     if (this.y + this.r < -50) this.reset();
   }
 }
 
-// Create marbles
 const marbles = Array.from({ length: 38 }, () => new Marble());
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Soft background tint
   const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   bg.addColorStop(0, 'rgba(250,247,240,0)');
   bg.addColorStop(1, 'rgba(214,234,248,0.04)');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   marbles.forEach(m => m.draw());
   requestAnimationFrame(animate);
 }
@@ -349,15 +299,12 @@ animate();
 const glow = document.getElementById('cursorGlow');
 document.addEventListener('mousemove', e => {
   glow.style.left = e.clientX + 'px';
-  glow.style.top = e.clientY + 'px';
+  glow.style.top  = e.clientY + 'px';
 });
 
-// ===== HERO TITLE CLICK → future login / identity page =====
-// TODO: Replace the URL below with your actual login or identity-recognition route.
-// e.g. window.location.href = '/login'  or  '/identify'
+// ===== HERO TITLE CLICK → /gateway/ =====
 document.getElementById('heroTitle').addEventListener('click', () => {
-  // window.location.href = '/login';   // ← uncomment & set target when backend is ready
-  console.log('[YISUN SPACE] Title clicked — navigation placeholder triggered.');
+  window.location.href = '/gateway/';
 });
 
 // ===== LETTER HOVER magnetic effect =====
@@ -365,15 +312,14 @@ document.querySelectorAll('.letter').forEach(el => {
   el.addEventListener('mousemove', e => {
     const rect = el.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / rect.width * 12;
+    const cy = rect.top  + rect.height / 2;
+    const dx = (e.clientX - cx) / rect.width  * 12;
     const dy = (e.clientY - cy) / rect.height * 12;
-    el.style.transform = `translate(${dx}px, ${dy}px) scale(1.05)`;
+    el.style.transform  = `translate(${dx}px, ${dy}px) scale(1.05)`;
     el.style.transition = 'transform 0.1s ease, color 0.3s ease';
   });
-
   el.addEventListener('mouseleave', () => {
-    el.style.transform = '';
+    el.style.transform  = '';
     el.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1), color 0.3s ease';
   });
 });
