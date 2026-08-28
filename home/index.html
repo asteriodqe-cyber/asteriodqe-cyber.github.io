@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>asteriodqe-cyber · Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/245598667?v=4">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="nav-inner">
+    <span class="nav-name">@asteriodqe-cyber</span>
+    <div class="nav-links">
+      <a href="#top" class="active">Home</a>
+      <a href="#projects">Projects</a>
+      <a href="https://github.com/asteriodqe-cyber">GitHub</a>
+      <button class="theme-toggle" type="button" aria-label="Toggle light / dark mode">☾</button>
+    </div>
+  </div>
+</nav>
+
+<!-- 印刷磨损滤镜：rough-sm 给文字毛边，rough-lg 给色块撕裂边 -->
+<svg class="svg-defs" aria-hidden="true">
+  <filter id="rough-sm" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="3" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.6"/>
+  </filter>
+  <filter id="rough-lg" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.055" numOctaves="4" seed="3" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="5"/>
+  </filter>
+</svg>
+
+<div class="sheet" id="top">
+  <header>
+    <div class="masthead">
+      <h1>asteriodqe-cyber</h1>
+      <hr class="underline-ink" />
+      <!-- ✏️ 改成你自己的自我介绍 -->
+      <p class="bio">
+        Hi! 这里是 <strong>asteriodqe-cyber</strong> 的主页。
+        一个喜欢写代码、折腾小项目的人。
+        这行字是占位符，随时换成你自己的故事。
+      </p>
+      <p class="bio">
+        <strong>Interests:</strong>
+        building <strong class="hl hl-olive">useless but fun</strong> things,
+        making <strong class="hl hl-teal">pixels</strong> move,
+        and petting <strong class="hl hl-rust">cats</strong>.
+      </p>
+    </div>
+    <figure class="polaroid" aria-label="avatar">
+      <div class="frame"><img src="https://avatars.githubusercontent.com/u/245598667?v=4" alt="avatar"></div>
+    </figure>
+  </header>
+
+  <div class="contact-row">
+    <a href="https://github.com/asteriodqe-cyber">
+      <svg class="icon-fill" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      github
+    </a>
+    <!-- ✏️ 取消注释并填上你的邮箱
+    <a href="mailto:you@example.com">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="1"/><path d="M2.2 4.5 8 9l5.8-4.5"/></svg>
+      email
+    </a>
+    -->
+    <span class="plain" id="cat-hint" tabindex="0" title="点右下角的猫试试">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="5" cy="6" r="1.6"/><circle cx="11" cy="6" r="1.6"/><path d="M2 9.5c1.5 2.5 4 4 6 4s4.5-1.5 6-4"/></svg>
+      psst… 右下角有只猫
+    </span>
+  </div>
+
+  <section>
+    <h2 class="marker">news</h2>
+    <ul class="news">
+      <!-- ✏️ 你的动态 -->
+      <li><time>2026.08</time><span>主页换了复古印刷皮肤，还养了一只像素猫。<span class="badge-new">NEW</span></span></li>
+    </ul>
+  </section>
+
+  <section id="projects">
+    <h2 class="marker">projects</h2>
+    <div class="pubs">
+      <article class="pub">
+        <div class="thumb thumb-lang" data-type="Python"><span class="thumb-glyph">🎸</span></div>
+        <div class="meta">
+          <h3 class="title">vsguitar</h3>
+          <p class="authors">吉他相关小工具 · Python</p>
+          <div class="links"><a href="https://github.com/asteriodqe-cyber/vsguitar">[code]</a></div>
+        </div>
+      </article>
+      <article class="pub">
+        <div class="thumb thumb-lang" data-type="HTML"><span class="thumb-glyph">🌌</span></div>
+        <div class="meta">
+          <h3 class="title">space</h3>
+          <p class="authors">yisun-space · HTML</p>
+          <div class="links"><a href="https://github.com/asteriodqe-cyber/space">[code]</a></div>
+        </div>
+      </article>
+      <article class="pub">
+        <div class="thumb thumb-lang" data-type="TypeScript"><span class="thumb-glyph">📺</span></div>
+        <div class="meta">
+          <h3 class="title">bshow</h3>
+          <p class="authors">TypeScript 项目</p>
+          <div class="links"><a href="https://github.com/asteriodqe-cyber/bshow">[code]</a></div>
+        </div>
+      </article>
+      <article class="pub">
+        <div class="thumb thumb-lang" data-type="Python"><span class="thumb-glyph">🧪</span></div>
+        <div class="meta">
+          <h3 class="title">bmtest</h3>
+          <p class="authors">测试项目 · Python</p>
+          <div class="links"><a href="https://github.com/asteriodqe-cyber/bmtest">[code]</a></div>
+        </div>
+      </article>
+    </div>
+    <a class="more-link" href="https://github.com/asteriodqe-cyber?tab=repositories"><svg viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M10 1.5 14.5 6 10 10.5"/></svg>all repositories</a>
+  </section>
+
+  <footer>
+    <span><span class="footer-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>retro print style inspired by <a href="https://anlorla.github.io/">anlorla</a> · walking cat inspired by <a href="https://freddierao.github.io/">freddierao</a> · pixel cat sprite based on <a href="https://github.com/adryd325/oneko.js">oneko.js</a> (MIT) · last updated 2026.08</span>
+  </footer>
+</div>
+
+<!-- 像素猫挂点：JS 驱动精灵图（已内联进 CSS） -->
+<div id="px-cat" title="喵？"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
